@@ -82,7 +82,7 @@ where MongoDB is used as database where all data is stored in the form of BSON.
 ```
 ### Starting Server
 ```bash
-    cd Server
+    cd server
     npm i
     npm run dev
 ```
