@@ -2,12 +2,18 @@
 
 A full-stack Todo application that helps users organise and manage their daily tasks efficiently.  
 Users can add, update, delete, and mark tasks as completed, ensuring better productivity and task management.
+
 ---
+
 ## Website link
- [Todo App](https://todo-app-project-submission.netlify.app/)
+
+[Todo App](https://todo-app-project-submission.netlify.app/)
+
 ---
+
 ## Tech Used 
- ### Frontend
+
+### Frontend
 
 - React
 - Axios
@@ -20,30 +26,45 @@ Users can add, update, delete, and mark tasks as completed, ensuring better prod
 - Express.js
 - MongoDB
 - Mongoose
+
 ---
+
 ## How Frontend and Backend works
 
+<p>
 Frontend is built using React, where Axios has played an important role to send HTTP request (GET, POST, PUT, DELETE).
+</p>
+
+<p>
 and backend is built using Node.js and Express.js to give server response back to client according to client request.
+</p>
+
+<p>
 where MongoDB is used as database where all data is stored in the form of BSON.
+</p>
+
 ---
+
 ## API overview
 
- - **GET:** https://todo-server-bfjv.onrender.com/todos
- - **POST:** https://todo-server-bfjv.onrender.com/todos/addtask
- - **PUT:** https://todo-server-bfjv.onrender.com/todos/updatetask/:id
- - **DELETE:** https://todo-server-bfjv.onrender.com/todos/deletetask/:id
+- **GET:** https://todo-server-bfjv.onrender.com/todos  
+- **POST:** https://todo-server-bfjv.onrender.com/todos/addtask  
+- **PUT:** https://todo-server-bfjv.onrender.com/todos/updatetask/:id  
+- **DELETE:** https://todo-server-bfjv.onrender.com/todos/deletetask/:id  
+
+---
 
 ## Challenges Faced
 
- - CORS errors which has been fixed by online documentations
- - connecting both frontend and backend
+- CORS errors which has been fixed by online documentations  
+- connecting both frontend and backend  
 
 ---
 
 ## How Setup is Done
 
-### Node initialization  
+### Node initialization
+
 ```bash
     npm init
 ```
