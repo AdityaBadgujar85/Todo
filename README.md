@@ -33,13 +33,7 @@ Users can add, update, delete, and mark tasks as completed, ensuring better prod
 
 <p>
 Frontend is built using React, where Axios has played an important role to send HTTP request (GET, POST, PUT, DELETE).
-</p>
-
-<p>
 and backend is built using Node.js and Express.js to give server response back to client according to client request.
-</p>
-
-<p>
 where MongoDB is used as database where all data is stored in the form of BSON.
 </p>
 
