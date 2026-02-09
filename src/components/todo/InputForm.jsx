@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { IoMdInformationCircleOutline } from "react-icons/io";
-import { MdDelete,MdEdit} from "react-icons/md";
+import { MdDelete,MdEdit, MdSearch} from "react-icons/md";
 import Axios from "axios"
 const baseURL = "https://todo-server-bfjv.onrender.com/todos" 
 const addURL = "https://todo-server-bfjv.onrender.com/todos/addtask"
@@ -10,6 +10,7 @@ const InputForm = () =>{
     const [updateId,setUpdateId] = useState(false)
     const [apiData,setApiData]=useState([])
     const [loading,setLoading] = useState(true) 
+    const [search, setSearch] = useState("")
     const handleSubmit=(e)=>{
         e.preventDefault()
         if(!todoTask.trim() || !todoDescription.trim()){
@@ -57,6 +58,21 @@ const InputForm = () =>{
 
     }
 
+    const handleSearch =(e)=>{
+        if(!search.trim()){
+            Axios.get(baseURL).then((res)=>{
+                setApiData(res.data.data)
+            })
+        return
+        }
+        e.preventDefault()
+        Axios.get(`https://todo-server-bfjv.onrender.com/todos/${search}`).then((res)=>{
+            setApiData([res.data.task])
+        }).catch(()=>{
+            alert("Task not found")
+        })
+    }
+
     return(
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100 gap-4 p-8 sm:p-15 select-none">
             <form action="" onSubmit={handleSubmit} className="flex justify-center items-start w-full flex-col gap-4 bg-white rounded-md p-5 sm:p-10"> 
@@ -78,7 +94,7 @@ const InputForm = () =>{
                 <input 
                 className="
                 w-full 
-                p-2 rounded-md 
+                rounded-md 
                 outline-none 
                 shadow-sm
                 shadow-gray-400
@@ -96,6 +112,10 @@ const InputForm = () =>{
             </div>
             :
             <div className="flex  flex-col gap-3 bg-white w-full rounded-md h-full p-5 sm:p-10">
+                <form onSubmit={handleSearch} className="flex">
+                    <input type="text" placeholder="Search task" value={search} className="p-1 ps-4 text-sm w-[95%] shadow rounded-bl-md rounded-tl-md outline-0 shadow-gray-400 focus:shadow-blue-300" onChange={(e)=>setSearch(e.target.value)}/>
+                    <button className="p-2 w-[15%] sm:w-[5%] bg-[#3D5B61] rounded-br-md rounded-tr-md flex justify-center items-center shadow shadow-gray-400"><MdSearch size={28} className="text-white"/></button>
+                </form>
                 {apiData.map((each)=>{
                     return(
                     <div key={each._id} className="bg-gray-200 justify-between px-4 py-3 flex rounded-md hover:bg-gray-300">
