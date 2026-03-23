@@ -1,149 +1,206 @@
-import { useEffect, useState } from "react"
-import { IoMdInformationCircleOutline } from "react-icons/io";
-import { MdDelete,MdEdit, MdSearch} from "react-icons/md";
-import Axios from "axios"
-const baseURL = "https://todo-server-bfjv.onrender.com/todos" 
-const addURL = "https://todo-server-bfjv.onrender.com/todos/addtask"
-const InputForm = () =>{
-    const [todoTask,setTodoTask] = useState("")
-    const [todoDescription,setTodoDescription] = useState("")
-    const [updateId,setUpdateId] = useState(false)
-    const [apiData,setApiData]=useState([])
-    const [loading,setLoading] = useState(true) 
-    const [search, setSearch] = useState("")
-    const handleSubmit=(e)=>{
-        e.preventDefault()
-        if(!todoTask.trim() || !todoDescription.trim()){
-            alert("Input cannot be empty")
-            return;
-        }
-        if(updateId){
-            Axios.put(`https://todo-server-bfjv.onrender.com/todos/updatetask/${updateId}`,{data:{todo:todoTask,description:todoDescription}}).then((res)=>{
-                setApiData((prev)=>prev.map((todo)=>todo._id === updateId ? res.data.data : todo))
-                setTodoTask("")
-                setTodoDescription("")
-                setUpdateId(false)
-            })
-        }else{
-            Axios.post(addURL,{data:{todo:todoTask,description:todoDescription,completed:false}}).then((res)=>{
-            setApiData(res.data.data)
-            setTodoTask("")
-            setTodoDescription("")
-        }).catch((error)=>{
-            console.log(error)
-        })
-        }
+import { useEffect, useState } from "react";
+import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
+import axios from "axios";
+
+const InputForm = () => {
+
+  const [todoText, setTodoText] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [todoList, setTodoList] = useState([]);
+  const [showList, setShowList] = useState([]);
+
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [searchText, setSearchText] = useState("");
+
+  const baseURL = "https://todo-server-bfjv.onrender.com/todos";
+
+  const loadTasks = async () => {
+    try {
+      const res = await axios.get(baseURL);
+      const data = res.data.data;
+      setTodoList(data);
+      setShowList(data);
+    } catch (err) {
+      console.log("cannot load tasks", err);
     }
-    const handleTaskStatus=(id,statusOfTask)=>{
-        Axios.put(`https://todo-server-bfjv.onrender.com/todos/updatetask/${id}`,{data:{completed:!statusOfTask}}).then((res)=>{
-            setApiData((prev)=>prev.map((todo)=>todo._id===id ? {...todo,completed:!statusOfTask}:todo))
-        }).catch((error)=>{
-            console.log(error)
-        })
-        
+    setLoading(false);
+  };
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const submitTask = async (e) => {
+    e.preventDefault();
+    if (todoText.trim() === "" || description.trim() === "") {
+      alert("please fill both fields");
+      return;
+    }
+    try {
+      if (editingId) {
+        await axios.put(`${baseURL}/updatetask/${editingId}`, {
+          data: {
+            todo: todoText,
+            description: description,
+          },
+        });
+
+      } else {
+        await axios.post(`${baseURL}/addtask`, {
+          data: {
+            todo: todoText,
+            description: description,
+            completed: false,
+          },
+        });
+
+      }
+
+      setTodoText("");
+      setDescription("");
+      setEditingId(null);
+      loadTasks();
+
+    } catch (err) {
+      console.log("error while saving", err);
+    }
+  };
+  const removeTask = async (id) => {
+
+    try {
+
+      await axios.delete(`${baseURL}/deletetask/${id}`);
+
+      loadTasks();
+
+    } catch (err) {
+      console.log("delete failed", err);
     }
 
-    useEffect(()=>{
-        Axios.get(baseURL).then((res)=>{
-            setApiData(res.data.data)
-            setLoading(false)
-        })
-    },[])
+  };
 
-
-    const handleDelete=(id)=>{
-        Axios.delete(`https://todo-server-bfjv.onrender.com/todos/deletetask/${id}`).then(()=>{
-            setApiData((prev)=>prev.filter((todo)=>todo._id !== id))
-        })
-
+  const changeStatus = async (id, value) => {
+    try {
+      await axios.put(`${baseURL}/updatetask/${id}`, {
+        data: {
+          completed: !value,
+        },
+      });
+      loadTasks();
+    } catch (err) {
+      console.log("status update error", err);
     }
 
-    const handleSearch =(e)=>{
-        if(!search.trim()){
-            Axios.get(baseURL).then((res)=>{
-                setApiData(res.data.data)
-            })
-        return
-        }
-        e.preventDefault()
-        Axios.get(`https://todo-server-bfjv.onrender.com/todos/${search}`).then((res)=>{
-            setApiData([res.data.task])
-        }).catch(()=>{
-            alert("Task not found")
-        })
-    }
+  };
 
-    return(
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100 gap-4 p-8 sm:p-15 select-none">
-            <form action="" onSubmit={handleSubmit} className="flex justify-center items-start w-full flex-col gap-4 bg-white rounded-md p-5 sm:p-10"> 
-                <h1 className="text-2xl text-gray-600">Todo</h1>
-                <div className="w-full flex flex-wrap gap-4">
-                <input 
-                className="
-                w-full 
-                p-2 rounded-md 
-                outline-none 
-                shadow-sm
-                shadow-gray-400
-                focus:shadow-blue-300
-                py-3
-                px-5
-                text-gray-700
-                " 
-                type="text" placeholder="Todo" onChange={(e)=>setTodoTask(e.target.value)} value={todoTask}/>
-                <input 
-                className="
-                w-full 
-                rounded-md 
-                outline-none 
-                shadow-sm
-                shadow-gray-400
-                focus:shadow-blue-300
-                py-3
-                px-5
-                text-gray-700" 
-                type="text" placeholder="Description" onChange={(e)=>setTodoDescription(e.target.value)} value={todoDescription}/>
-                </div>
-                <button className="px-4 py-2 rounded-md text-white w-full sm:w-[30%] bg-[#3D5B61] hover:bg-[#24383c] cursor-pointer">{updateId?"Update Task":"Add Task"}</button>
-            </form> 
-            {loading?             
-            <div className="flex  flex-col justify-center items-center gap-3 bg-white w-full rounded-md h-full p-10">
-                <div className="w-10 h-10 border-5 border-gray-300 border-t-5 border-t-gray-700 rounded-full animate-spin" ></div>
-            </div>
-            :
-            <div className="flex  flex-col gap-3 bg-white w-full rounded-md h-full p-5 sm:p-10">
-                <form onSubmit={handleSearch} className="flex">
-                    <input type="text" placeholder="Search task" value={search} className="p-1 ps-4 text-sm w-[95%] shadow rounded-bl-md rounded-tl-md outline-0 shadow-gray-400 focus:shadow-blue-300" onChange={(e)=>setSearch(e.target.value)}/>
-                    <button className="p-2 w-[15%] sm:w-[5%] bg-[#3D5B61] rounded-br-md rounded-tr-md flex justify-center items-center shadow shadow-gray-400"><MdSearch size={28} className="text-white"/></button>
-                </form>
-                {apiData.map((each)=>{
-                    return(
-                    <div key={each._id} className="bg-gray-200 justify-between px-4 py-3 flex rounded-md hover:bg-gray-300">
-                    <div className="flex">
-                    <input type="checkbox" name="" id="checkBox" className="scale-150 accent-[#3D5B61]" onChange={()=>handleTaskStatus(each._id,each.completed)} checked={each.completed}/>
-                    <div className="flex justify-center items-center">
-                    <label  style={{textDecoration: each.completed ? "line-through" : "none"}} className="text-gray-600 w-full ms-5" htmlFor="">{each.todo}</label>
-                    </div>
-                    </div>
-                    <div className="flex justify-center items-center gap-2 text-gray-700">
-                        <div className="flex justify-center items-center relative group">
-                            <IoMdInformationCircleOutline size={20} className="cursor-pointer"/> 
-                            <div className="absolute right-full text-white hidden group-hover:block w-50 min-h-15 sm:w-100 wrap-break-word rounded-md p-3 text-sm z-10" style={{background:'#3D5B61'}}>
-                                <p>{each.description}</p>
-                            </div>
-                        </div>
-                        <MdEdit size={20} className="cursor-pointer" onClick={()=> {setTodoTask(each.todo) 
-                                                        setTodoDescription(each.description)
-                                                        setUpdateId(each._id)
-                                                        }}/>
-                        <MdDelete size={20} className="cursor-pointer" onClick={()=>handleDelete(each._id)}/>
-                    </div>
-                    </div>
-                    )
-                })}
-            </div>
-            }
+  useEffect(() => {
+    let arr = [];
+    if (searchText === "") {
+
+      arr = todoList;
+    } else {
+      arr = todoList.filter((t) => {
+        return t.todo.toLowerCase().includes(searchText.toLowerCase());
+      });
+
+    }
+    setShowList(arr);
+
+  }, [searchText, todoList]);
+  return (
+
+    <div className="flex flex-col items-center justify-center bg-gray-100 gap-4 p-8 sm:p-15 select-none">
+      <form
+        onSubmit={submitTask}
+        className="flex flex-col gap-4 bg-white rounded-md p-6 sm:p-10 w-full"
+      >
+        <h2 className="text-xl text-gray-600">Todo</h2>
+        <input
+          type="text"
+          placeholder="Todo"
+          value={todoText}
+          onChange={(e) => setTodoText(e.target.value)}
+          className="w-full p-3 px-5 rounded-md outline-none shadow-sm shadow-gray-400 focus:shadow-blue-300 text-gray-700"
+        />
+        <input
+          type="text"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full p-3 px-5 rounded-md outline-none shadow-sm shadow-gray-400 focus:shadow-blue-300 text-gray-700"
+        />
+        <button className="px-4 py-2 rounded-md text-white w-full sm:w-[30%] bg-[#3D5B61] hover:bg-[#24383c] cursor-pointer">
+          {editingId ? "Update Task" : "Add Task"}
+        </button>
+
+      </form>
+      {loading ? (
+        <div className="bg-white w-full rounded-md p-10 text-center">
+          Loading...
         </div>
-    )
-}
-export default InputForm
+      ) : (
+        <div className="flex flex-col gap-3 bg-white w-full rounded-md p-6 sm:p-10">
+          <div className="flex">
+            <input
+              type="text"
+              placeholder="Search task"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="p-2 ps-4 text-sm w-[95%] shadow rounded-bl-md rounded-tl-md outline-none shadow-gray-400 focus:shadow-blue-300"
+            />
+            <button
+              type="button"
+              className="p-2 w-[15%] sm:w-[5%] bg-[#3D5B61] rounded-br-md rounded-tr-md flex justify-center items-center shadow shadow-gray-400"
+            >
+              <MdSearch size={22} className="text-white" />
+            </button>
+
+          </div>
+
+          {showList.map((item) => (
+            <div
+              key={item._id}
+              className="bg-gray-200 flex justify-between px-4 py-3 rounded-md hover:bg-gray-300"
+            >
+              <div className="flex items-start">
+                <input
+                  type="checkbox"
+                  className="scale-150 accent-[#3D5B61]"
+                  checked={item.completed}
+                  onChange={() => changeStatus(item._id, item.completed)}
+                />
+                <div className="ms-5">
+                  <label className="text-gray-700">
+                    {item.todo}
+                  </label>
+                  <p className="text-sm text-gray-600">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <MdEdit
+                  size={20}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setTodoText(item.todo);
+                    setDescription(item.description);
+                    setEditingId(item._id);
+                  }}
+                />
+                <MdDelete
+                  size={20}
+                  className="cursor-pointer"
+                  onClick={() => removeTask(item._id)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+export default InputForm;

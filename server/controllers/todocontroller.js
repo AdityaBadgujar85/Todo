@@ -38,14 +38,13 @@ exports.addTask = async(req,res) => {
     if(!data || Object.keys(data).length===0){
         return res.status(400).json({
             success:false,
-            message:" fill input"
+            message:"fill input"
         })
     } 
-    await todomodel.create(data)
-    const todo = await todomodel.find();
+    const tododata  = await todomodel.create(data)
     res.status(200).json({
         success: true,
-        data: todo
+        data: tododata
     })
 }
 
