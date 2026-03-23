@@ -95,7 +95,7 @@ const Todo = () => {
           <input type="text" onChange={(e)=>setDescription(e.target.value)} value={description} className="outline-[0.5px] p-2 rounded shadow-sm focus:shadow-blue-300 px-3 focus:outline-blue-300"/>
         </div>
         <div>
-        <button className="bg-blue-400 px-10 py-2 text-white rounded hover:cursor-pointer">Add</button>
+        <button className="bg-blue-400 px-10 py-2 text-white rounded hover:cursor-pointer">{editId ? "Update":"Add"}</button>
         </div>
         </form>
       </div>
