@@ -8,6 +8,7 @@ const Todo = () => {
     const [search, setSearch] = useState("");
     const {todos,dispatch} = useTodosContext();
     const [editId, setEditId] = useState(null);
+    const [loading,setLoading] = useState(true)
     const handleSubmit = async(e) => {
     e.preventDefault();
     if(editId){
@@ -62,6 +63,7 @@ const Todo = () => {
             type:"SET_TODOS",
             payload: res.data.data
            }) 
+           setLoading(false);
         }catch(error){
             console.log(error)
         }
@@ -98,7 +100,11 @@ const Todo = () => {
         </form>
       </div>
       <div className="w-[90%] max-w-xxl p-10 rounded-lg shadow-lg">
-        <div className="flex flex-col gap-5">
+      {loading?(
+        <div className="flex justify-center items-center">
+          Loading.....
+        </div>
+      ):<div className="flex flex-col gap-5">
        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} className="outline-[0.5px] shadow rounded px-3 py-1 focus:outline-blue-300 focus:shadow-blue-300" placeholder="search"/>
         {todos && todos.filter((item)=>{
           return item && item.todo.toLowerCase().includes(search.toLowerCase());
@@ -126,6 +132,7 @@ const Todo = () => {
             )
         })}
         </div>
+     }
       </div>
     </div>
   );
